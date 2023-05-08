@@ -4,6 +4,7 @@ require_relative "lib/jekyll-sqlite/version"
 
 Gem::Specification.new do |spec|
   spec.name = "jekyll-sqlite"
+  spec.license = "MIT"
   spec.version = Jekyll::Sqlite::VERSION
   spec.authors = ["Nemo"]
   spec.email = ["jekyll@captnemo.in"]
