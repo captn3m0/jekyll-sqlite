@@ -1,4 +1,4 @@
-# Jekyll SQlite plugin
+# Jekyll SQLite plugin
 
 A Jekyll generator plugin to lets you use SQLite database instead of data files as a data source.
 
