@@ -51,6 +51,30 @@ Then, you can use the `site.data` attributes accordingly:
 {% endfor %}
 ```
 
+It works well with the datapage_gen plugin:
+
+See the [datapage_gen](https://github.com/avillafiorita/jekyll-datapage_gen) docs for more details.
+
+Here's a sample configuration:
+
+```yaml
+# This will automatically generate a file for each restaurant
+# restaurants/#{id}.html file
+# with the layout `_layouts/restaurant.html`
+# and page.id, page.name, page.active set
+# and page.title set to restaurant name
+sqlite:
+  restaurants:
+    file: _db/reviews.db
+    sql: SELECT id, name, last_review_date > 1672531200 as active, address FROM restaurants;
+page_gen:
+  - data: restaurants
+    template: restaurant
+    name: id
+    title: name
+    filter: active
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
