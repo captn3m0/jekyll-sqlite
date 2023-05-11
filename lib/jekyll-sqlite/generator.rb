@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+require 'sqlite3'
 module JekyllSQlite
   # Main generator class
   class Generator < Jekyll::Generator
