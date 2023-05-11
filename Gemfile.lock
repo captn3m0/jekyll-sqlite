@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    jekyll-sqlite (0.1.0)
+    jekyll-sqlite (0.1.1)
       sqlite3 (~> 1.6)
 
 GEM
