@@ -21,10 +21,10 @@ module JekyllSQlite
       root
     end
 
-    def gen_hash_data(root, db, _query)
+    def gen_hash_data(root, db, query, name)
       root ||= {}
 
-      root[name] = db.execute(config["query"])
+      root[name] = db.execute(query)
       root[name].size
     end
 
@@ -59,7 +59,7 @@ module JekyllSQlite
     def gen_data(root, config, name, db)
       count = 0
       if root.nil? || (root.is_a? Hash)
-        count = gen_hash_data(root, db, config["query"])
+        count = gen_hash_data(root, db, config["query"], name)
       elsif root.is_a? Array
         count = array_gen(root, config, name, db)
       end
@@ -71,14 +71,17 @@ module JekyllSQlite
     end
 
     def generate(site)
-      site.config["sqlite"].each do |config|
-        name = config["data"]
-        SQLite3::Database.new config["file"], readonly: true do |db|
-          fast_setup db
-          db.results_as_hash = config.fetch("results_as_hash", true)
-          root = get_root(site.data, name)
-          count = gen_data(root, config, get_tip(name), db)
-          Jekyll.logger.info "Jekyll SQLite:", "Loaded #{name}. Count=#{count}. as_hash=#{db.results_as_hash}"
+      data = site.config["sqlite"]
+      if data
+        data.each do |config|
+          name = config["data"]
+          SQLite3::Database.new config["file"], readonly: true do |db|
+            fast_setup db
+            db.results_as_hash = config.fetch("results_as_hash", true)
+            root = get_root(site.data, name)
+            count = gen_data(root, config, get_tip(name), db)
+            Jekyll.logger.info "Jekyll SQLite:", "Loaded #{name}. Count=#{count}. as_hash=#{db.results_as_hash}"
+          end
         end
       end
     end
