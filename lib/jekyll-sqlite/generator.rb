@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-require 'sqlite3'
+
+require "sqlite3"
 module JekyllSQlite
   # Main generator class
   class Generator < Jekyll::Generator
@@ -47,6 +48,8 @@ module JekyllSQlite
       count = 0
       root.each do |item|
         # TODO: Add support for binding Arrays as well.
+        # TODO: Figure out a syntax for indirect reference
+        # (site.data.a.b.c should be able to reference a and b both)
         if item.is_a? Hash
           count += gen_nested_data(item, db, config["query"], name)
         else

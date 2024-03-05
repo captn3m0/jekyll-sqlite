@@ -1,4 +1,6 @@
-require: rubocop-rake
+require: 
+- rubocop-rake
+- rubocop-minitest
 AllCops:
   TargetRubyVersion: 3.0
   NewCops: enable
