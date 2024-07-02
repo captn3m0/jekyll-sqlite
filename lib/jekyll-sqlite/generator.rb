@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "sqlite3"
 
 module JekyllSQlite
@@ -76,24 +77,29 @@ module JekyllSQlite
       return false unless config.key?("query")
       return false unless File.exist?(config["file"])
       return false unless config.key?("data")
+
       true
     end
 
+    def generate_data_from_config(site, config)
+      d_name = config["data"]
+      SQLite3::Database.new config["file"], readonly: true do |db|
+        fast_setup db
+        db.results_as_hash = config.fetch("results_as_hash", true)
+        root = get_root(site.data, d_name)
+        count = gen_data(root, config, get_tip(d_name), db)
+        Jekyll.logger.info "Jekyll SQLite:", "Loaded #{d_name}. Count=#{count}"
+      end
+    end
+
     def generate(site)
-      gem_config = site.config['sqlite'] || []
+      gem_config = site.config["sqlite"] || []
       gem_config.each do |config|
         unless validate_config(config)
           Jekyll.logger.error "Jekyll SQLite:", "Invalid Configuration. Skipping"
           next
         end
-        d_name = config["data"]
-        SQLite3::Database.new config["file"], readonly: true do |db|
-          fast_setup db
-          db.results_as_hash = config.fetch("results_as_hash", true)
-          root = get_root(site.data, d_name)
-          count = gen_data(root, config, get_tip(d_name), db)
-          Jekyll.logger.info "Jekyll SQLite:", "Loaded #{d_name}. Count=#{count}"
-        end
+        generate_data_from_config(site, config)
       end
     end
   end
