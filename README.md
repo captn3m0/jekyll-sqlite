@@ -25,41 +25,32 @@ plugins:
 
 ## Usage
 
-Update your `_config.yml` to define your data sources with your SQLite database.
+Update your `_config.yml` to define your data sources with your SQLite database. Please see
+the `test` directory for a functional example with the [Northwind database](https://github.com/jpwhite3/northwind-SQLite3).
 
 ```yml
 ...
-# These are run in sequence, so any nested data can work well.
 sqlite:
-  - data: members
-    file: _db/users.db
-    query: SELECT * FROM members ORDER by created_at DESC
-  # You can use `results_as_hash` to switch between array or hash results (default).
-  - data: verified
-    results_as_hash: false # default true
-    file: _db/users.db
-    query: SELECT username, email FROM members WHERE verified=1
-  - data: members.posts
-    file: _db/posts.db
-    query: SELECT * FROM posts WHERE user_id = :id
+  - data: orders
+    file: &db "_db/northwind.db"
+    query: SELECT * from Orders
+  - data: customers
+    file: *db
+    query: SELECT * from Customers
+  - data: categories
+    file: *db
+    query: SELECT CategoryID, CategoryName, Description FROM Categories
+  # Note that the CategoryID parameter in the query is coming from site.data.categories[].CategoryID
+  # which was picked up in the previous query
+  - data: categories.products
+    file: *db
+    query: SELECT ProductID, ProductName FROM Products WHERE Products.CategoryID=:CategoryID
 ```
 
 Then, you can use the `site.data` attributes accordingly:
 
 ```liquid
-{% for member in site.data.members %}
-- {{member.username}}
-
-  # Your Posts
-  {% for post in member.posts %}
-    {{post}}
-  {% endfor %}
-{% endfor %}
-
-# Result here is an array instead of a hash.
-{% for user in site.data.verified %}
-- :check: {{user[0]}} (Email: {{user[1]}})
-{% endfor %}
+{{ site.data.categories | jsonify }}
 ```
 
 ## Generating Pages
