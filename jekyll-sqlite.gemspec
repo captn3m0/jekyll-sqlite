@@ -7,9 +7,9 @@ Gem::Specification.new do |spec|
   spec.license = "MIT"
   spec.version = Jekyll::Sqlite::VERSION
   spec.authors = ["Nemo"]
-  spec.email = ["jekyll@captnemo.in"]
+  spec.email = ["jekyll-sqlite@captnemo.in"]
 
-  spec.summary = "A Jekyll plugin that lets you use SQLite database instead of data files as a data source."
+  spec.summary = "A Jekyll plugin to use SQLite databases as a data source."
   spec.homepage = "https://github.com/captn3m0/jekyll-sqlite"
   spec.required_ruby_version = ">= 3.0.0"
 
@@ -28,7 +28,6 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  # Uncomment to register a new dependency of your gem
   spec.add_dependency "sqlite3", "~> 1.6"
   spec.metadata["rubygems_mfa_required"] = "true"
 end
