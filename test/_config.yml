@@ -1,0 +1,17 @@
+exclude:
+  - _db
+  - _plugins
+  - .gitignore
+sqlite:
+  - data: orders
+    file: &db "_db/northwind.db"
+    query: SELECT * from Orders
+  - data: customers
+    file: *db
+    query: SELECT * from Customers
+  - data: categories
+    file: *db
+    query: SELECT CategoryID, CategoryName, Description FROM Categories
+  - data: categories.products
+    file: *db
+    query: SELECT ProductID, ProductName FROM Products WHERE Products.CategoryID=:CategoryID

@@ -1,0 +1,7 @@
+---
+---
+{
+	"orders": {{site.data.orders | jsonify}},
+	"customers": {{ site.data.customers | jsonify }},
+	"categories": {{ site.data.categories | jsonify }}
+}
