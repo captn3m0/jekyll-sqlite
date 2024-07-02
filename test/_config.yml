@@ -14,4 +14,4 @@ sqlite:
     query: SELECT CategoryID, CategoryName, Description FROM Categories
   - data: categories.products
     file: *db
-    query: SELECT ProductID, ProductName FROM Products WHERE Products.CategoryID=:CategoryID
+    query: SELECT ProductID, ProductName,CategoryID FROM Products WHERE Products.CategoryID=:CategoryID
