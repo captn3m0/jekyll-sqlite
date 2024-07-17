@@ -5,83 +5,76 @@ require "sqlite3"
 module JekyllSQlite
   # Main generator class
   class Generator < Jekyll::Generator
-    safe true
     # Set to high to be higher than the Jekyll Datapages Plugin
     priority :high
-    # Default pragma
-    def fast_setup(db)
-      db.execute("PRAGMA synchronous = OFF")
-      db.execute("PRAGMA journal_mode = OFF")
-      db.execute("PRAGMA query_only = ON")
-    end
 
-    # Get the root of where we are generating the data
-    def get_root(root, db_name)
-      db_name.split(".")[0..-2].each do |p|
-        root = root[p]
-      end
-      root
-    end
-
-    def gen_hash_data(root, db, db_name, query)
-      root ||= {}
-      db.prepare(query) do |stmt|
-        root.each do |key, value|
-          # disallow complex types
-          unless value.is_a? Array or value.is_a? Hash
-            begin
-              stmt.bind_param key, value
-            rescue StandardError # rubocop:disable Lint/SuppressedException
-            end
-          end
-        end
-        root[db_name] = stmt.execute.enum_for(:each_hash).to_a
-      end
-      root[db_name].count
-    end
-
-    def gen_nested_data(item, db, query, db_name)
-      item[db_name] = []
-      db.prepare(query) do |stmt|
-        # We bind params, ignoring any errors
-        # Since there's no way to get required params
-        # From a statement
-        item.each do |key, value|
-          stmt.bind_param key, value
-        rescue StandardError # rubocop:disable Lint/SuppressedException
-        end
-        stmt.execute.each { |d| item[db_name] << d }
-      end
-      item[db_name].size
-    end
-
-    def array_gen(root, config, db_name, db)
-      count = 0
-      root.each do |item|
-        # TODO: Add support for binding Arrays as well.
-        if item.is_a? Hash
-          count += gen_nested_data(item, db, config["query"], db_name)
-        else
-          Jekyll.logger.info "Jekyll SQLite:", "Item is not a hash for #{db_name}. Unsupported configuration"
-        end
-      end
-      count
-    end
-
-    def gen_data(root, config, db_name, db)
-      count = 0
-      if root.nil? || (root.is_a? Hash)
-        count = gen_hash_data(root, db, db_name, config["query"])
-      elsif root.is_a? Array
-        count = array_gen(root, config, db_name, db)
-      end
-      count
-    end
-
+    ##
+    # Split the given key using dots and return the last part
+    #   customers.order -> order
     def get_tip(name)
       name.split(".")[-1]
     end
 
+    ##
+    # Get the root of where we are generating the data
+    def get_root(root, db_name)
+      db_name.split(".")[0..-2].each do |p|
+        root = root[p]
+      rescue KeyError
+        raise "Jekyll SQLite: Invalid root. #{p} not found while iterating to #{db_name}"
+      end
+      root
+    end
+
+    ##
+    # Prepare the query by binding the parameters
+    # from the root
+    # All primitive values are bound to the query
+    # Arrays and Hashes are ignored
+    # Since we don't know if the query needs them
+    # we ignore all errors about "no such bind parameter"
+    def _prepare_query(stmt, root)
+      root.each do |key, value|
+        next if value.is_a?(Array) || value.is_a?(Hash)
+
+        begin
+          stmt.bind_param key, value
+        rescue StandardError => e
+          raise e unless e.message.include? "no such bind parameter"
+        end
+      end
+    end
+
+    ##
+    # Internal function to generate data given
+    # root: a Hash-Like root object (site.data, site.data.*, page.data)
+    # query: string containing the query to execute
+    # db_name: string as the key to use to attach the data to the root
+    # db: SQLite3 Database object to execute the query on
+    # Sets root[db_name] = ResultSet of the query, as an array
+    def _gen_data(root, query, db_name, db)
+      db.prepare(query) do |stmt|
+        _prepare_query stmt, root
+        root[db_name] = stmt.execute.to_a
+      end
+      root[db_name].count
+    end
+
+    ##
+    # Calls _gen_data for the given root
+    # iterates through the array if root is an array
+    def gen_data(root, ...)
+      if root.nil? || (root.is_a? Hash)
+        _gen_data(root, ...)
+      elsif root.is_a? Array
+        # call gen_data for each item in the array
+        # and return the sum of all the counts
+        root.map { |item| gen_data(item, ...) }.sum
+      end
+    end
+
+    ##
+    # Validate given configuration object
     def validate_config(config)
       return false unless config.is_a? Hash
       return false unless config.key?("query")
@@ -91,49 +84,51 @@ module JekyllSQlite
       true
     end
 
-    def generate_page_data_from_config(page, config)
+    ##
+    # Given a configuration, generate the data
+    # and attach it to the given data_root
+    def generate_data_from_config(data_root, config)
       d_name = config["data"]
       SQLite3::Database.new config["file"], readonly: true do |db|
-        fast_setup db
         db.results_as_hash = config.fetch("results_as_hash", true)
-        root = get_root(page.data, d_name)
-        count = gen_data(root, config, get_tip(d_name), db)
+        branch = get_root(data_root, d_name)
+        get_tip(d_name)
+        count = gen_data(branch, config["query"], get_tip(d_name), db)
         Jekyll.logger.info "Jekyll SQLite:", "Loaded #{d_name}. Count=#{count}"
       end
     end
 
-    def generate_data_from_config(site, config)
-      d_name = config["data"]
-      SQLite3::Database.new config["file"], readonly: true do |db|
-        fast_setup db
-        db.results_as_hash = config.fetch("results_as_hash", true)
-        root = get_root(site.data, d_name)
-        count = gen_data(root, config, get_tip(d_name), db)
-        Jekyll.logger.info "Jekyll SQLite:", "Loaded #{d_name}. Count=#{count}"
+    ##
+    # Iterate through all the pages in the site
+    # and generate the data from the configuration
+    def gen_pages(site)
+      site.pages.each do |page|
+        gen(page.data, page)
       end
     end
 
-    def generate(site)
-      gem_config = site.config["sqlite"] || []
-      gem_config.each do |config|
+    ##
+    # Generate the data from the configuration
+    # Takes as input the root where the data will be attached
+    # and a configuration holder, where the sqlite key can be found
+    # Root is either site.data or page.data
+    # and config_holder is either site.config or page itself.
+    def gen(root, config_holder)
+      sqlite_configs = config_holder["sqlite"] || []
+      sqlite_configs.each do |config|
         unless validate_config(config)
           Jekyll.logger.error "Jekyll SQLite:", "Invalid Configuration. Skipping"
           next
         end
-        generate_data_from_config(site, config)
+        generate_data_from_config(root, config)
       end
+    end
 
-      site.pages.each do |page|
-        next unless page['sqlite'].is_a? Array
-        page['sqlite'].each do |config|
-          unless validate_config(config)
-            Jekyll.logger.error "Jekyll SQLite:", "Invalid Configuration for #{page.path}. Skipping"
-            next
-          end
-          generate_page_data_from_config(page, config)
-        end
-      end
-
+    ##
+    # Entrpoint to the generator, called by Jekyll
+    def generate(site)
+      gen(site.data, site.config)
+      gen_pages(site)
     end
   end
 end
