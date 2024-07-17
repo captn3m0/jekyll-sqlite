@@ -24,7 +24,7 @@ jobs:
       - name: Run tests
         run: bundle exec rake test
   build:
-    if: ${{ ! startsWith(github.ref, 'refs/tags/v') && github.repository == 'captn3m0/jekyll-sqlite'}}
+    if: ${{ startsWith(github.ref, 'refs/tags/v') && github.repository == 'captn3m0/jekyll-sqlite'}}
     permissions:
       contents: write
       id-token: write
