@@ -33,8 +33,8 @@ def validate_json
   data["categories"][0]["products"].each do |p|
     assert p["CategoryID"] == 1, "CategoryID doesn't match"
   end
-  assert data['delayedOrders'].size == 17
-  assert data['delayedOrders'][0]['OrderID'] == 10249
+  assert data["delayedOrders"].size == 17
+  assert data["delayedOrders"][0]["OrderID"] == 10_249
 end
 
 def validate_page_json
@@ -42,17 +42,17 @@ def validate_page_json
   read_data = JSON.parse(File.read(file))
   data = read_data["allSuppliers"]
   assert data.size == 29, "Expected 29 suppliers, got #{data.size}"
-  r =  query_db("SELECT CompanyName, SupplierID FROM Suppliers ORDER BY SupplierID LIMIT 1")
-  assert r['CompanyName'] == data[0]['CompanyName'], "Company Name doesn't match"
-  assert r['SupplierID'] == data[0]['SupplierID'], "Supplier ID doesn't match"
+  r = query_db("SELECT CompanyName, SupplierID FROM Suppliers ORDER BY SupplierID LIMIT 1")
+  assert r["CompanyName"] == data[0]["CompanyName"], "Company Name doesn't match"
+  assert r["SupplierID"] == data[0]["SupplierID"], "Supplier ID doesn't match"
   assert data[0]["products"].size == 3, "Products don't match"
-  assert data[0]['products'][0]["ProductName"] == 'Chai'
-  assert data[0]['products'][1]["ProductName"] == 'Chang'
-  assert data[0]['products'][2]["ProductName"] == 'Aniseed Syrup'
+  assert data[0]["products"][0]["ProductName"] == "Chai"
+  assert data[0]["products"][1]["ProductName"] == "Chang"
+  assert data[0]["products"][2]["ProductName"] == "Aniseed Syrup"
 
   # Focus Supplier - this uses the data from the page front-matter to prepare a query
   fs = query_db("SELECT * FROM Suppliers WHERE SupplierID = 6")
-  assert read_data['focusSupplier'][0] == fs, "Focus Supplier doesn't match"
+  assert read_data["focusSupplier"][0] == fs, "Focus Supplier doesn't match"
 end
 # rubocop:enable Metrics/AbcSize
 # rubocop:enable Metrics/MethodLength

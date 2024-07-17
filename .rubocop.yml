@@ -2,7 +2,12 @@ require: rubocop-rake
 AllCops:
   TargetRubyVersion: 3.0
   NewCops: enable
-
+  Exclude:
+    - "node_modules/**/*"
+    - "tmp/**/*"
+    - "vendor/**/*"
+    - ".git/**/*"
+    - "test/_plugins/jekyll_sqlite_generator.rb"
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: double_quotes
@@ -15,4 +20,4 @@ Layout/LineLength:
   Max: 120
 
 Metrics/AbcSize:
-  Max: 20
+  Max: 15

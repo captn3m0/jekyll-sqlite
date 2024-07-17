@@ -28,48 +28,42 @@ module JekyllSQlite
 
     ##
     # Prepare the query by binding the parameters
-    # from the root
-    # All primitive values are bound to the query
-    # Arrays and Hashes are ignored
     # Since we don't know if the query needs them
     # we ignore all errors about "no such bind parameter"
-    def _prepare_query(stmt, root)
-      root.each do |key, value|
-        next if value.is_a?(Array) || value.is_a?(Hash)
-
-        begin
-          stmt.bind_param key, value
-        rescue StandardError => e
-          raise e unless e.message.include? "no such bind parameter"
-        end
+    def _prepare_query(stmt, params)
+      params.each do |key, value|
+        stmt.bind_param key, value
+      rescue StandardError => e
+        raise e unless e.message.include? "no such bind parameter"
       end
     end
 
     ##
     # Internal function to generate data given
     # root: a Hash-Like root object (site.data, site.data.*, page.data)
-    # query: string containing the query to execute
-    # db_name: string as the key to use to attach the data to the root
+    # key: string as the key to use to attach the data to the root
     # db: SQLite3 Database object to execute the query on
+    # query: string containing the query to execute
     # Sets root[db_name] = ResultSet of the query, as an array
-    def _gen_data(root, query, db_name, db)
+    # Returns the count of the result set
+    def _gen_data(root, key, db, query)
       db.prepare(query) do |stmt|
-        _prepare_query stmt, root
-        root[db_name] = stmt.execute.to_a
+        _prepare_query stmt, get_bind_params(root)
+        root[key] = stmt.execute.to_a
       end
-      root[db_name].count
+      root[key].count
     end
 
     ##
     # Calls _gen_data for the given root
     # iterates through the array if root is an array
     def gen_data(root, ...)
-      if root.nil? || (root.is_a? Hash)
-        _gen_data(root, ...)
-      elsif root.is_a? Array
+      if root.is_a? Array
         # call gen_data for each item in the array
         # and return the sum of all the counts
         root.map { |item| gen_data(item, ...) }.sum
+      else
+        _gen_data(root, ...)
       end
     end
 
@@ -84,17 +78,29 @@ module JekyllSQlite
       true
     end
 
+    ## pick bindable parameters
+    # from the root
+    # All primitive values are bound to the query
+    # Arrays and Hashes are ignored
+    def get_bind_params(dict)
+      dict.select { |_key, value| !value.is_a?(Array) && !value.is_a?(Hash) }
+    end
+
     ##
     # Given a configuration, generate the data
     # and attach it to the given data_root
-    def generate_data_from_config(data_root, config)
-      d_name = config["data"]
-      SQLite3::Database.new config["file"], readonly: true do |db|
+    def generate_data_from_config(root, config)
+      key = config["data"]
+      query = config["query"]
+      file = config["file"]
+      SQLite3::Database.new file, readonly: true do |db|
         db.results_as_hash = config.fetch("results_as_hash", true)
-        branch = get_root(data_root, d_name)
-        get_tip(d_name)
-        count = gen_data(branch, config["query"], get_tip(d_name), db)
-        Jekyll.logger.info "Jekyll SQLite:", "Loaded #{d_name}. Count=#{count}"
+
+        branch = get_root(root, key)
+        tip = get_tip(config["data"])
+
+        count = gen_data(branch, tip, db, query)
+        Jekyll.logger.info "Jekyll SQLite:", "Loaded #{key}. Count=#{count}"
       end
     end
 
