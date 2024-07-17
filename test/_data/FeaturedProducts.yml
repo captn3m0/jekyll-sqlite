@@ -1,0 +1,13 @@
+# List of Featured Products
+# available at site.data.FeaturedProducts[*].FP_ID
+#
+# We use FP_ID to make it easy to distinguish in the query
+# Note that this could easily have been a CSV file
+- FP_ID: 23
+  reason: BestSeller
+- FP_ID: 26
+  reason: BestSeller
+- FP_ID: 50
+  reason: New Launch
+- FP_ID: 57
+  reason: New Launch

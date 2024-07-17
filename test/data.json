@@ -3,5 +3,6 @@
 {
 	"orders": {{site.data.orders | jsonify}},
 	"customers": {{ site.data.customers | jsonify }},
-	"categories": {{ site.data.categories | jsonify }}
+	"categories": {{ site.data.categories | jsonify }},
+	"delayedOrders": {{site.data.DelayedOrders | jsonify}}
 }

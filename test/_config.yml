@@ -2,6 +2,8 @@ exclude:
   - _db
   - _plugins
   - .gitignore
+include:
+  - suppliers.json
 sqlite:
   - data: orders
     file: &db "_db/northwind.db"
@@ -15,3 +17,12 @@ sqlite:
   - data: categories.products
     file: *db
     query: SELECT ProductID, ProductName,CategoryID FROM Products WHERE Products.CategoryID=:CategoryID
+  # site.data.FeaturedProducts is a list created via _data/FeaturedProducts.yml
+  # This can re-use the data from the file to query the database
+  - data: FeaturedProducts.details
+    file: *db
+    query: SELECT ProductID, ProductName, UnitPrice FROM Products WHERE ProductID = :FP_ID
+  # We can also use single value from site.data.SpeedyExpress to get the ID for the query
+  - data: DelayedOrders
+    file: *db
+    query: SELECT OrderID from Orders WHERE ShipVia = :SpeedyExpress

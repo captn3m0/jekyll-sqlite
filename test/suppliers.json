@@ -1,0 +1,17 @@
+---
+FocusSupplierId: 6
+sqlite:
+  - data: focusSupplier
+    file: "_db/northwind.db"
+    query: "SELECT * FROM suppliers WHERE SupplierID = :FocusSupplierId"
+  - data: suppliers
+    file: "_db/northwind.db"
+    query: "SELECT CompanyName, SupplierID FROM suppliers ORDER BY SupplierID"
+  - data: suppliers.products
+    file: "_db/northwind.db"
+    query: "SELECT ProductName, CategoryID,UnitPrice FROM products WHERE SupplierID = :SupplierID"
+---
+{
+  "allSuppliers": {{page.suppliers|jsonify}},
+  "focusSupplier": {{page.focusSupplier|jsonify}}
+}

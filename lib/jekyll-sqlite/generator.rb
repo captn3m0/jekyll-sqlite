@@ -25,9 +25,19 @@ module JekyllSQlite
 
     def gen_hash_data(root, db, db_name, query)
       root ||= {}
-
-      root[db_name] = db.execute(query)
-      root[db_name].size
+      db.prepare(query) do |stmt|
+        root.each do |key, value|
+          # disallow complex types
+          unless value.is_a? Array or value.is_a? Hash
+            begin
+              stmt.bind_param key, value
+            rescue StandardError # rubocop:disable Lint/SuppressedException
+            end
+          end
+        end
+        root[db_name] = stmt.execute.enum_for(:each_hash).to_a
+      end
+      root[db_name].count
     end
 
     def gen_nested_data(item, db, query, db_name)
@@ -81,6 +91,17 @@ module JekyllSQlite
       true
     end
 
+    def generate_page_data_from_config(page, config)
+      d_name = config["data"]
+      SQLite3::Database.new config["file"], readonly: true do |db|
+        fast_setup db
+        db.results_as_hash = config.fetch("results_as_hash", true)
+        root = get_root(page.data, d_name)
+        count = gen_data(root, config, get_tip(d_name), db)
+        Jekyll.logger.info "Jekyll SQLite:", "Loaded #{d_name}. Count=#{count}"
+      end
+    end
+
     def generate_data_from_config(site, config)
       d_name = config["data"]
       SQLite3::Database.new config["file"], readonly: true do |db|
@@ -101,6 +122,18 @@ module JekyllSQlite
         end
         generate_data_from_config(site, config)
       end
+
+      site.pages.each do |page|
+        next unless page['sqlite'].is_a? Array
+        page['sqlite'].each do |config|
+          unless validate_config(config)
+            Jekyll.logger.error "Jekyll SQLite:", "Invalid Configuration for #{page.path}. Skipping"
+            next
+          end
+          generate_page_data_from_config(page, config)
+        end
+      end
+
     end
   end
 end
