@@ -22,12 +22,13 @@ plugins:
   - jekyll_sqlite
 ```
 
-:warning: If you are using Jekyll < 3.5.0 use the `gems` key instead of `plugins`.
-
 ## Usage
 
-Update your `_config.yml` to define your data sources with your SQLite database. Please see
-the `test` directory for a functional example with the [Northwind database](https://github.com/jpwhite3/northwind-SQLite3).
+🏁 A fully-functional demo website that uses this plugin is available at
+[northwind.captnemo.in](https://northwind.captnemo.in). The source code for
+the demo is available at [captn3m0/northwind](https://github.com/captn3m0/northwind).
+
+Update your `_config.yml` to define your data sources with your SQLite database.
 
 ```yml
 ...
@@ -138,6 +139,9 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/captn3m0/jekyll-sqlite. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/captn3m0/jekyll-sqlite/blob/main/CODE_OF_CONDUCT.md).
+
+Note that only maintained versions of [Jekyll](https://endoflife.date/jekyll) and
+[Ruby](https://endoflife.date/ruby) are supported.
 
 ## Code of Conduct
 
