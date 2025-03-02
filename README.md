@@ -63,8 +63,8 @@ and the prices for the items in your SQLite database, the following configuratio
 ```yaml
 sql:
 - data: items.books
+  file: books.db
   query: SELECT price, author FROM pricing WHERE id =:id
-  db: books.db
 ```
 This would allow the following Liquid loop to be written:
 
@@ -113,22 +113,21 @@ Here's a sample configuration:
 
 ```yaml
 sqlite:
-  restaurants:
+  - data: restaurants
     file: _db/reviews.db
-    sql: SELECT id, name, last_review_date > 1672531200 as active, address FROM restaurants;
+    query: SELECT id, name, last_review_date > 1672531200 as active, address FROM restaurants;
 page_gen:
   - data: restaurants
     template: restaurant
+    page_data_prefix: restaurants
     name: id
     title: name
     filter: active
 ```
 
-This will automatically generate a file for each restaurant
-restaurants/#{id}.html file with the layout `_layouts/restaurant.html` and page.id, page.name, page.active set and page.title set to restaurant name
+This will automatically generate a file for each restaurant `restaurants/#{id}.html` file with the layout `_layouts/restaurant.html` and page.id, page.name, page.active set and page.title set to restaurant name. Query data is accessed in the page template via `{{ page.restaurants.address }}` - the namespace set in `page_data_prefix`.
 
-Note that the `datapage_gen` plugin will run _after_ the `jekyll-sqlite` plugin,
-if you generate any pages with per-page queries, these queries will not execute.
+Note that the `datapage_gen` plugin will run _after_ the `jekyll-sqlite` plugin, if you generate any pages with per-page queries, these queries will not execute.
 
 ## Development
 
@@ -140,8 +139,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/captn3m0/jekyll-sqlite. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/captn3m0/jekyll-sqlite/blob/main/CODE_OF_CONDUCT.md).
 
-Note that only maintained versions of [Jekyll](https://endoflife.date/jekyll) and
-[Ruby](https://endoflife.date/ruby) are supported.
+Note that only maintained versions of [Jekyll](https://endoflife.date/jekyll) and [Ruby](https://endoflife.date/ruby) are supported.
 
 ## Code of Conduct
 
