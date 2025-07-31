@@ -69,7 +69,7 @@ module JekyllSQlite
 
     ##
     # Validate given configuration object
-    def validate_config(config)
+    def valid_config?(config)
       return false unless config.is_a? Hash
       return false unless config.key?("query")
       return false unless File.exist?(config["file"])
@@ -122,7 +122,7 @@ module JekyllSQlite
     def gen(root, config_holder)
       sqlite_configs = config_holder["sqlite"] || []
       sqlite_configs.each do |config|
-        unless validate_config(config)
+        unless valid_config?(config)
           Jekyll.logger.error "Jekyll SQLite:", "Invalid Configuration. Skipping"
           next
         end
