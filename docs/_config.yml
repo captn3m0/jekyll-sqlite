@@ -1,0 +1,44 @@
+theme: just-the-docs
+title: Jekyll SQLite
+description: >-
+  generator plugin to lets you use SQLite database instead of data files as a
+  data source. It lets you easily create APIs and websites from a SQLite
+  database, by linking together a database file, your template, and the relevant
+  queries. 
+baseurl: "/jekyll-sqlite"
+url: "https://captnemo.in"
+github_username:  captn3m0
+# https://just-the-docs.com/docs/configuration/
+favicon_ico: https://jekyllrb.com/favicon.ico
+aux_links:
+  GitHub:
+    - "https://github.com/captn3m0/jekyll-sqlite/"
+  RubyGems:
+    - "https://rubygems.org/gems/jekyll-sqlite"
+gh_edit_link: true
+gh_edit_link_text: "Edit this page on GitHub."
+gh_edit_repository: "https://github.com/captn3m0/jekyll-sqlite" # the github URL for your repo
+gh_edit_branch: "main"
+gh_edit_source: docs
+gh_edit_view_mode: "edit"
+
+callouts:
+  demo:
+    color: green
+    opacity: 0.5
+  note:
+    color: yellow
+    opacity: 0.3
+# https://jekyllrb.com/docs/configuration/front-matter-defaults/
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+encoding: utf-8
+markdown: kramdown
+strict_front_matter: true
+# Silence Saas deprecation warnings, to be removed after this is fixed in just-the-docs
+sass:
+  quiet_deps: true # https://github.com/just-the-docs/just-the-docs/issues/1541
+  silence_deprecations: ['import']
