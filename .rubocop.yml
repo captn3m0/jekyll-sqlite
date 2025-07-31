@@ -1,6 +1,6 @@
 plugins: rubocop-rake
 AllCops:
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.2
   NewCops: enable
   Exclude:
     - "node_modules/**/*"
@@ -8,6 +8,7 @@ AllCops:
     - "vendor/**/*"
     - ".git/**/*"
     - "test/_plugins/jekyll_sqlite_generator.rb"
+    - "docs/**/*"
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: double_quotes
