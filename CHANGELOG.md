@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.1.6] - 2025-07-31
+- Drop Ruby 3.1
+- sqlite3 requirement to `2.7.3`
+
+## [0.1.5] - 2024-07-31
+- sqlite3 requirement changed to `1.6`
+
 ## [0.1.4] - 2024-07-17
 - Per-page queries are now supported via a `sqlite` config block in the front matter.
 - Documents support for existing site data being used within queries.
