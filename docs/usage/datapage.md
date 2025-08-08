@@ -62,7 +62,7 @@ In order to get data into the array, we can use:
 ```yml
 sqlite:
   - data: products
-    file: *db
+    file: _db/northwind.db
     query: SELECT * from Products
 ```
 
