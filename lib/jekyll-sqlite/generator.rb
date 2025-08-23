@@ -79,7 +79,7 @@ module JekyllSQlite
       key = config["data"]
       query = config["query"]
       file = config["file"]
-      
+
       db = get_database(file)
       db.results_as_hash = config.fetch("results_as_hash", true)
       path_segments = key.split(".")
