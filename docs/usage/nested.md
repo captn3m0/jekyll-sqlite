@@ -5,7 +5,7 @@ nav_order: 4
 ---
 Starting from `0.2.0`, queries can be nested infinitely.
 
-The following configuration is used in the [demo](../demo/):
+The following configuration is used in the [Demo]({% link demo.md %}):
 
 ```yaml
 sqlite:

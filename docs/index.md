@@ -21,6 +21,6 @@ for reshaping datasets - supporting joins, filters, and aggregations. So this
 allows you to use SQL for reshaping your data, and then use liquid
 for what it was meant for - presentation and templating.
 
-[![Continuous Integration](https://github.com/captn3m0/jekyll-sqlite/actions/workflows/main.yml/badge.svg)](https://github.com/captn3m0/jekyll-sqlite/actions/workflows/main.yml) [![Gem Version](https://badge.fury.io/rb/jekyll-sqlite.svg)](https://badge.fury.io/rb/jekyll-sqlite)
+[![Continuous Integration](https://github.com/captn3m0/jekyll-sqlite/actions/workflows/main.yml/badge.svg)](https://github.com/captn3m0/jekyll-sqlite/actions/workflows/main.yml) [![Gem Version](https://badge.fury.io/rb/jekyll-sqlite.svg)](https://rubygems.org/gems/jekyll-sqlite)
 
 [df]: https://jekyllrb.com/docs/datafiles/ "Data Files at Jekyll Docs site"

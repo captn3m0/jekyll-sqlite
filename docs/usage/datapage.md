@@ -41,7 +41,7 @@ Note that the `datapage_gen` plugin will run _after_ the `jekyll-sqlite` plugin,
 
 ## Demo Example
 
-The following example comes from the [Demo](../demo/).
+The following example comes from the [Demo]({% link demo.md %}).
 
 The following datapage configuration in `_config.yml`:
 

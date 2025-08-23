@@ -1,6 +1,5 @@
 ---
 title: Demo
-permalink: /demo.html
 ---
 
 🏁 A fully-functional demo website that uses this plugin is available at
@@ -25,5 +24,6 @@ plugin to generate individual pages for each data item.
    in `config.yml`, but the query parameters are set in [`_data`](https://github.com/captn3m0/northwind/tree/main/_data)
    directory as YML files.
 5. The datapage plugin config generates a page for every product and customer.
+6. A multi-level nested query is used to generate a list of employees. See [Nested Query]({% link usage/nested.md %}) in docs.
 
-The database is a trimmed-version of the northwind database from https://github.com/jpwhite3/northwind-SQLite3.
+The database is a trimmed-version of the northwind database from <https://github.com/jpwhite3/northwind-SQLite3>.
