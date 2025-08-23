@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-08-23
+- Multiple-levels of nesting is now supported
+- Slight performance improvement by keeping database open for entire plugin run
+
 ## [0.1.6] - 2025-07-31
 - Drop Ruby 3.1
 - sqlite3 requirement to `2.7.3`
