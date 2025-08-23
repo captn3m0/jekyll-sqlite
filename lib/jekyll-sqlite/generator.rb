@@ -8,6 +8,16 @@ module JekyllSQlite
     # Set to high to be higher than the Jekyll Datapages Plugin
     priority :high
 
+    def get_database(file)
+      return @db[file] if @db.key?(file)
+
+      @db[file] = SQLite3::Database.new file, readonly: true
+    end
+
+    def close_all_databases
+      @db.each_value(&:close)
+    end
+
     ##
     # Recursively attach query results to nested data structures
     # Supports arbitrary levels of nesting (e.g., regions.territories.EmployeeIDs)
@@ -69,13 +79,12 @@ module JekyllSQlite
       key = config["data"]
       query = config["query"]
       file = config["file"]
-      SQLite3::Database.new file, readonly: true do |db|
-        db.results_as_hash = config.fetch("results_as_hash", true)
-
-        path_segments = key.split(".")
-        count = attach_nested_data(root, path_segments, db, query)
-        Jekyll.logger.info "Jekyll SQLite:", "Loaded #{key}. Count=#{count}"
-      end
+      
+      db = get_database(file)
+      db.results_as_hash = config.fetch("results_as_hash", true)
+      path_segments = key.split(".")
+      count = attach_nested_data(root, path_segments, db, query)
+      Jekyll.logger.info "Jekyll SQLite:", "Loaded #{key}. Count=#{count}"
     end
 
     ##
@@ -85,8 +94,7 @@ module JekyllSQlite
     # Root is either site.data or page.data
     # and config_holder is either site.config or page itself.
     def gen(root, config_holder)
-      sqlite_configs = config_holder["sqlite"] || []
-      sqlite_configs.each do |config|
+      (config_holder["sqlite"] || []).each do |config|
         unless valid_config?(config)
           Jekyll.logger.error "Jekyll SQLite:", "Invalid Configuration. Skipping"
           next
@@ -98,10 +106,13 @@ module JekyllSQlite
     ##
     # Entrpoint to the generator, called by Jekyll
     def generate(site)
+      @db = {}
       gen(site.data, site.config)
       site.pages.each do |page|
         gen(page.data, page)
       end
+    ensure
+      close_all_databases
     end
   end
 end
