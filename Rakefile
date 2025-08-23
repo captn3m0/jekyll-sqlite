@@ -19,7 +19,6 @@ def query_db(query)
 end
 
 # rubocop:disable Metrics/AbcSize
-# rubocop:disable Metrics/MethodLength
 def validate_json
   file = "_site/data.json"
   data = JSON.parse(File.read(file))
@@ -54,9 +53,25 @@ def validate_page_json
   fs = query_db("SELECT * FROM Suppliers WHERE SupplierID = 6")
   assert read_data["focusSupplier"][0] == fs, "Focus Supplier doesn't match"
 end
-# rubocop:enable Metrics/AbcSize
-# rubocop:enable Metrics/MethodLength
 
+def validate_employees_json
+  file = "_site/employees.json"
+  regions = JSON.parse(File.read(file))
+  assert regions.size == 4
+  assert regions[0]["RegionID"] == 1, "First RegionID should be 1"
+  assert regions[0]["RegionDescription"] == "Eastern", "First Region is Eastern"
+  assert regions[-1]["RegionID"] == 4, "Four zotal Regions"
+  assert regions[0]["territories"].size == 19, "There should be 19 territories in Eastern"
+  assert regions[0]["territories"][0]["TerritoryID"] == "01730", "First TerritoryID should be 1"
+  assert regions[0]["territories"][0]["TerritoryDescription"] == "Bedford", "First TerritoryID should be Bedford"
+  bedford = regions[0]["territories"][0]
+  assert bedford == {
+    "TerritoryID" => "01730",
+    "TerritoryDescription" => "Bedford",
+    "EmployeeIDs" => [{ "EmployeeID" => 2, "FirstName" => "Andrew", "LastName" => "Fuller" }]
+  }, "Bedford should have Andrew Fuller"
+end
+# rubocop:enable Metrics/AbcSize
 task default: :rubocop
 
 desc "Build Test Site"
@@ -65,4 +80,5 @@ task :test do
   Jekyll::Site.new(Jekyll.configuration).process
   validate_json
   validate_page_json
+  validate_employees_json
 end
