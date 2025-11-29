@@ -27,6 +27,6 @@ Gem::Specification.new do |spec|
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-  spec.add_dependency "sqlite3", "~> 2.7.3"
+  spec.add_dependency "sqlite3", "~> 2.9.0"
   spec.metadata["rubygems_mfa_required"] = "true"
 end
