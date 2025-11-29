@@ -49,10 +49,12 @@ module JekyllSQlite
     # Since we don't know if the query needs them
     # we ignore all errors about "no such bind parameter"
     def _prepare_query(stmt, params)
-      params.each do |key, value|
-        stmt.bind_param key, value
-      rescue StandardError => e
-        raise e unless e.message.include? "no such bind parameter"
+      stmt.named_params.each do |key|
+        val = params[key]
+        unless [Integer, String, Float, SQLite3::Blob, nil].include? val.class
+          Jekyll.logger.error "#{key} type is #{val.class} in query: #{stmt.get_sql}"
+        end
+        stmt.bind_param key, params[key]
       end
     end
 
