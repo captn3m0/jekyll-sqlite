@@ -25,5 +25,6 @@ plugin to generate individual pages for each data item.
    directory as YML files.
 5. The datapage plugin config generates a page for every product and customer.
 6. A multi-level nested query is used to generate a list of employees. See [Nested Query]({% link usage/nested.md %}) in docs.
+7. A permalink is set for all the customers by creating a permalink attribute in the select query: `SELECT ... as permalink`. Since we are setting a top-level attribute in the final page, it cannot be set alongside `page_data_prefix` in the datapage_gen configuration. See [this commit](https://github.com/captn3m0/northwind/commit/3d70d6a81be34af5f1ebbcfa5da09a170f2ee9ff) for the implementation. I'd suggest only using this when the `dir + name/name_expr` configuration in the `datapage` plugin fall short.
 
 The database is a trimmed-version of the northwind database from <https://github.com/jpwhite3/northwind-SQLite3>.
