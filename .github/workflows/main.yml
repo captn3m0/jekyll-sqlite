@@ -8,9 +8,10 @@ jobs:
     strategy:
       matrix:
         ruby:
-          - "3.2"
-          - "3.3"
-          - "3.4"
+          - "3.2" # Mar 2026
+          - "3.3" # Mar 2027
+          - "3.4" # Mar 2028
+          - "4.0" # Mar 2029
     steps:
       - uses: actions/checkout@v5
       - name: Set up Ruby
@@ -35,6 +36,6 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.4"
+          ruby-version: "4.0"
           bundler-cache: true
       - uses: rubygems/release-gem@v1
