@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-01-03
+- Only passes named parameters in SQLite query. Requires sqlite3-ruby 2.9.0
+
 ## [0.2.0] - 2025-08-23
 - Multiple-levels of nesting is now supported
 - Slight performance improvement by keeping database open for entire plugin run
