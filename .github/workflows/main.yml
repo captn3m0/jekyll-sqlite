@@ -1,21 +1,28 @@
 name: CI
 on:
   push:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+permissions: {}
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     name: Test - Ruby ${{ matrix.ruby }}
     strategy:
       matrix:
         ruby:
-          - "3.2" # Mar 2026
           - "3.3" # Mar 2027
           - "3.4" # Mar 2028
           - "4.0" # Mar 2029
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@c4e5b1316158f92e3d49443a9d58b31d25ac0f8f # v1.306.0
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
@@ -24,18 +31,21 @@ jobs:
       - name: Run tests
         run: bundle exec rake test
   build:
-    if: ${{ startsWith(github.ref, 'refs/tags/v') && github.repository == 'captn3m0/jekyll-sqlite'}}
     permissions:
-      contents: write
-      id-token: write
+      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
+      contents: write # IMPORTANT: this permission is required for `rake release` to push the release tag
+    if: ${{ startsWith(github.ref, 'refs/tags/v') && github.repository == 'captn3m0/jekyll-sqlite'}}
     runs-on: ubuntu-latest
     name: Release Gem
     needs: test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@c4e5b1316158f92e3d49443a9d58b31d25ac0f8f # v1.306.0
         with:
           ruby-version: "4.0"
-          bundler-cache: true
-      - uses: rubygems/release-gem@v1
+          bundler-cache: false
+      - uses: rubygems/release-gem@6317d8d1f7e28c24d28f6eff169ea854948bd9f7 # v1.2.0
+          
