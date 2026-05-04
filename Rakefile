@@ -2,8 +2,7 @@
 
 require "bundler/gem_tasks"
 require "rubocop/rake_task"
-require "jekyll"
-require "sqlite3"
+
 
 RuboCop::RakeTask.new
 
@@ -12,6 +11,7 @@ def assert(cond, msg = "Assertion Failed")
 end
 
 def query_db(query)
+  require "sqlite3"
   db = SQLite3::Database.new "_db/northwind.db"
   db.results_as_hash = true
   results = db.execute query
@@ -142,6 +142,7 @@ task default: :rubocop
 
 desc "Build Test Site"
 task :test do
+  require "jekyll"
   Dir.chdir("test")
   Jekyll::Site.new(Jekyll.configuration).process
   validate_json
