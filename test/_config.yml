@@ -4,6 +4,17 @@ exclude:
   - .gitignore
 include:
   - suppliers.json
+  - collections.json
+collections:
+  posts:
+    output: false
+  shippers:
+    # Each row carries its own per-row permalink, generated in SQL.
+    output: true
+  shipper_pages:
+    # Common permalink template; SQL provides path/name/title used by placeholders.
+    output: true
+    permalink: /:path/:name-:title:output_ext
 sqlite:
   - data: orders
     file: &db "_db/northwind.db"
@@ -44,3 +55,31 @@ sqlite:
       SELECT T.EmployeeID as EmployeeID, FirstName,LastName FROM EmployeeTerritories T,Employees
       WHERE T.TerritoryID = :TerritoryID
       AND T.EmployeeID = Employees.EmployeeID
+
+  # Collections: write query results into Jekyll collections
+  # instead of site.data. site.posts is special (built-in collection).
+  - collection: posts
+    file: *db
+    query: |
+      SELECT 'Order ' || OrderID AS title,
+             OrderDate AS date,
+             OrderID, CustomerID, ShipName
+      FROM Orders ORDER BY OrderID LIMIT 5
+  - collection: shippers
+    file: *db
+    query: |
+      SELECT ShipperID, CompanyName, Phone, Content AS content,
+             '/shippers/' || ShipperID || '.html' AS permalink
+      FROM Shippers ORDER BY ShipperID
+
+  # Common permalink template `/:path/:name-:title:output_ext` defined on the
+  # collection. SQL produces the columns those placeholders read from.
+  - collection: shipper_pages
+    file: *db
+    query: |
+      SELECT ShipperID,
+             'companies'             AS path,
+             'shipper-' || ShipperID AS name,
+             CompanyName             AS title,
+             Content                 AS content
+      FROM Shippers ORDER BY ShipperID

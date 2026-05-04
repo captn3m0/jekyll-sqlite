@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-04
+- Adds collection support
+
 ## [0.2.1] - 2026-01-03
 - Only passes named parameters in SQLite query. Requires sqlite3-ruby 2.9.0
 

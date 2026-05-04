@@ -1,0 +1,28 @@
+---
+---
+{
+  "postsCount": {{site.posts.size}},
+  "shippersCount": {{site.shippers.size}},
+  "shipperPagesCount": {{site.shipper_pages.size}},
+  "posts": [{% for p in site.posts %}{
+    "title": {{p.title|jsonify}},
+    "OrderID": {{p.OrderID|jsonify}},
+    "CustomerID": {{p.CustomerID|jsonify}},
+    "ShipName": {{p.ShipName|jsonify}},
+    "date": {{p.date|date:"%Y-%m-%d"|jsonify}}
+  }{% unless forloop.last %},{% endunless %}{% endfor %}],
+  "shippers": [{% for s in site.shippers %}{
+    "ShipperID": {{s.ShipperID|jsonify}},
+    "CompanyName": {{s.CompanyName|jsonify}},
+    "Phone": {{s.Phone|jsonify}},
+    "permalink": {{s.permalink|jsonify}},
+    "url": {{s.url|jsonify}}
+  }{% unless forloop.last %},{% endunless %}{% endfor %}],
+  "shipperPages": [{% for s in site.shipper_pages %}{
+    "ShipperID": {{s.ShipperID|jsonify}},
+    "title": {{s.title|jsonify}},
+    "path": {{s.path|jsonify}},
+    "name": {{s.name|jsonify}},
+    "url": {{s.url|jsonify}}
+  }{% unless forloop.last %},{% endunless %}{% endfor %}]
+}
