@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 require "sqlite3"
+require "time"
 
 module JekyllSQlite
   # Main generator class
+  # rubocop:disable Metrics/ClassLength
   class Generator < Jekyll::Generator
     # Set to high to be higher than the Jekyll Datapages Plugin
     priority :high
@@ -59,12 +61,14 @@ module JekyllSQlite
     end
 
     ##
-    # Validate given configuration object
+    # Validate given configuration object.
+    # A config is valid when it is a Hash with a query, a readable file,
+    # and either a data: or collection: target.
     def valid_config?(config)
       return false unless config.is_a? Hash
       return false unless config.key?("query")
-      return false unless File.exist?(config["file"])
-      return false unless config.key?("data")
+      return false unless config["file"] && File.exist?(config["file"])
+      return false unless config.key?("data") || config.key?("collection")
 
       true
     end
@@ -101,14 +105,71 @@ module JekyllSQlite
           Jekyll.logger.error "Jekyll SQLite:", "Invalid Configuration. Skipping"
           next
         end
-        generate_data_from_config(root, config)
+
+        if config["collection"]
+          generate_collection_from_config(config)
+        else
+          generate_data_from_config(root, config)
+        end
       end
+    end
+
+    ##
+    # Build documents from query rows and append them to the named site collection.
+    def generate_collection_from_config(config)
+      name = config["collection"]
+      collection = @site.collections[name]
+      unless collection
+        Jekyll.logger.error "Jekyll SQLite:", "Collection '#{name}' not declared in _config.yml"
+        return
+      end
+
+      db = get_database(config["file"])
+      db.results_as_hash = config.fetch("results_as_hash", true)
+      rows = db.execute(config["query"])
+      rows.each_with_index { |row, idx| collection.docs << build_collection_doc(collection, row, idx) }
+      Jekyll.logger.info "Jekyll SQLite:", "Loaded collection #{name}. Count=#{rows.size}"
+    end
+
+    # Build a synthetic document path from optional `name` and `path` columns.
+    # Falls back to a 1-based row id (idx+1) when `name` is missing, and to
+    # no subdirectory when `path` is missing. The `name` and `path` SQL
+    # columns are what feed Jekyll's :name and :path permalink placeholders.
+    def synth_doc_path(collection, row, idx)
+      name = column_string(row, "name") || (idx + 1).to_s
+      subdir = column_string(row, "path")
+      parts = ["_#{collection.label}"]
+      parts << subdir if subdir
+      parts << "#{name}.md"
+      File.join(@site.source, *parts)
+    end
+
+    def build_collection_doc(collection, row, idx)
+      doc = Jekyll::Document.new(synth_doc_path(collection, row, idx),
+                                 site: @site, collection: collection)
+      row.each do |k, v|
+        next unless k.is_a?(String)
+
+        v = Time.parse(v) if k == "date" && v.is_a?(String)
+        doc.data[k] = v
+      end
+      # Jekyll's :title permalink placeholder reads data["slug"], not data["title"].
+      # Auto-populate slug from title so SQL-provided titles show up in URLs.
+      doc.data["slug"] ||= doc.data["title"]
+      doc.content = row.key?("content") ? row["content"].to_s : ""
+      doc
+    end
+
+    def column_string(row, key)
+      v = row[key]
+      v.is_a?(String) && !v.empty? ? v : nil
     end
 
     ##
     # Entrpoint to the generator, called by Jekyll
     def generate(site)
       @db = {}
+      @site = site
       gen(site.data, site.config)
       site.pages.each do |page|
         gen(page.data, page)
@@ -117,4 +178,5 @@ module JekyllSQlite
       close_all_databases
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

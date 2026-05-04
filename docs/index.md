@@ -3,16 +3,17 @@ title: Home
 nav_order: 0
 ---
 
-A Jekyll generator plugin to lets you use SQLite databases instead of [Data Files][df] as a 
-data source. It lets you easily create APIs and websites from a SQLite
-database, by linking together a database file, your template, and the relevant
-queries.
+A Jekyll generator plugin to lets you use SQLite databases instead of
+[Data Files][df] or markdown files as input. It lets you easily
+create APIs and websites from a SQLite database, by linking together a
+database file, your template, and the relevant queries.
 
 Jekyll's Data Files are great, but they are limited to YAML/JSON/TSV/CSV file
 formats - this plugin gives you another option: SQLite databases.
 
 It supports site-level queries, per-page queries, and prepared queries that can
-use existing data (possibly generated via more queries) as parameters.
+use existing data (possibly generated via more queries) as parameters. It also
+supports creating or inserting into existing collections.
 
 The primary usecase is to **avoid Liquid Hell**, wherein you're left mangling
 multiple data sources from CSV/JSON/YAML files using liquid templating by

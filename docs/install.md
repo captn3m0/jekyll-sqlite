@@ -20,4 +20,4 @@ See [Usage](/jekyll-sqlite/usage/) for next steps.
 ---
 
 Note that only supported versions of [Ruby](https://endoflife.date/ruby)
-and [Jekyll](https://endoflife.date/ruby) are supported.
+and [Jekyll](https://endoflife.date/jekyll) are supported.

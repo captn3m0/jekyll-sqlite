@@ -8,6 +8,11 @@ The Jekyll [Datapage Generator](https://github.com/avillafiorita/jekyll-datapage
 plugin allows you to specify data files for which we want to
 generate one page per record.
 
+{: .note }
+> **Consider using collections**
+> If your table/view is simple, and your layout doesn't need an extra
+> query per row, it might be simpler to just use [Collections](collections.html)
+
 You can use it alongside this plugin to generate data from a SQLite database,
 and generate a page per row of your resultset.
 

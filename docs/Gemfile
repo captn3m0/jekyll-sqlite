@@ -3,3 +3,5 @@ gem "jekyll", "~> 4.4.1"
 gem "just-the-docs"
 
 gem "logger", "~> 1.7"
+
+gem "erb", "~> 6.0"
