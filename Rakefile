@@ -3,6 +3,7 @@
 require "bundler/gem_tasks"
 require "rubocop/rake_task"
 
+Bundler::GemHelper.install_tasks
 RuboCop::RakeTask.new
 
 def assert(cond, msg = "Assertion Failed")
