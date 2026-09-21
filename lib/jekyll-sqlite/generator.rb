@@ -5,7 +5,7 @@ require "time"
 
 module JekyllSQlite
   # Main generator class
-  # rubocop:disable Metrics/ClassLength
+  # rubocop:disable-next Metrics/ClassLength
   class Generator < Jekyll::Generator
     # Set to high to be higher than the Jekyll Datapages Plugin
     priority :high
@@ -178,5 +178,4 @@ module JekyllSQlite
       close_all_databases
     end
   end
-  # rubocop:enable Metrics/ClassLength
 end
