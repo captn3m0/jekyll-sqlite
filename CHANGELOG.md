@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-11-16
+- Allow sqlite3 2.10 (`>= 2.9, < 2.11`)
+
 ## [0.4.0] - 2026-05-05
 - Adds collection support
 
